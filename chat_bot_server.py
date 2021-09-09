@@ -69,6 +69,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         return True
 
     def search_items_by_bert_embedding(self, text):
+        global df_embedding
         print('serach item')
 
         # 既存のタイトルと一番近い距離のタイトルを検索
@@ -76,7 +77,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         target_text = text
         target_embedding = calc_embedding_last_layer(target_text)
 
-        all_embedding = np.vstack((embedding_array, target_embedding))
+        all_embedding = np.vstack((df_embedding, target_embedding))
         # お尻にvstackする。
 
         # ベクトル間の距離の計算
