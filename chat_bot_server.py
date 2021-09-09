@@ -119,6 +119,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
 
 def calc_embedding_last_layer(text):
+    global bert_tokenizer
     # 特徴量抽出の関数の定義
     # やってることは最終層の出力を見るだけ
     # 最終層のレイヤーの出力。これをそのまま使うのは良くないと公式ドキュメントにあるそうな
