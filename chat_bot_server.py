@@ -51,7 +51,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         print('received:', message)
 
-        self.search_items_by_bert_embedding(message)
+        result_text = self.search_items_by_bert_embedding(message)
 
         self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p>' + result_text)
 
