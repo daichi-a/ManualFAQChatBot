@@ -1,4 +1,7 @@
 'use strict';
+
+// chat_bot_client.js
+
 window.addEventListener('load', function(){
     // 内部で使うプロパティは全てグローバルのものなので，アローによる定義の必要はない
     // グローバル変数で(windowオブジェクトのプロパティとして)
@@ -24,14 +27,14 @@ window.startConnection = function(event){
     };
 
     window.webSocket.onmessage = function(event){
-	alert(event.data);
+	//alert(event.data);
 	window.document.getElementById("view_field").innerHTML =
-	    '<p>Server: ' + event.data + '</p>'
+	    '<div><p>チャットボット:</p>' + event.data + '</div>'
     };
 
     window.webSocket.onerror = function(error){
 	document.getElementById("view_field").innerHTML = 
-	    '<p>WebSocket Error: ' + error + '</p>';
+        '<div><p>チャットボット:</p> <p>エラーが発生しました</p>' + error + '</div>'
     };
 
     window.webSocket.onclose = function(event){

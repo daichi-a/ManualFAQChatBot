@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- WSTextMessageJSClient.html -->
+<!-- chat_bot_client.html -->
 
 <html lang="ja">
 <head>
@@ -7,23 +7,33 @@
   <meta charset="utf-8" />
 
   <title>kibaco manual FAQ chat bot</title>
-  <script type="text/javascript" src="WSTextMessageJSClient.js">
+  <script type="text/javascript" src="chat_bot_client.js">
   </script>
   
 </head>
 <body>
-  <div id="controll_field">
-    <p>
-      <input type="button" value="接続開始" onclick="startConnection()" />
-      <input type="button" value="接続終了" onclick="exitConnection()" />
-    </p>
-    <form>
-      <input type="text" name="text_field" value="ここに入力して「送信」ボタンを押してください．" />
-      <input type="button" name="send_button" value="送信" onclick="sendMessage(this.form.elements['text_field'].value)" />
-    </form>
-  </div>
-  <div id="view_field">
-    <p>初期テキスト</p>
-  </div>
+    <div>
+        <p>
+            <input type="button" value="接続開始" onclick="startConnection()" />
+            <input type="button" value="接続終了" onclick="exitConnection()" />
+        </p>  
+    </div>
+
+
+    <div id="view_field">
+        <p>
+            上に表示されている「開始する」ボタンを押してください。
+        </p>
+        <p>
+            チャットボットが、マニュアルやFAQの検索のお手伝いをします。
+        </p>
+    </div>
+    <div id="controll_field">
+        <form>
+            <input type="text" name="text_field" value="ここに入力して「送信」ボタンを押してください．" />
+            <input type="button" name="send_button" value="送信" onclick="sendMessage(this.form.elements['text_field'].value)" />
+        </form>
+    </div>
+
 </body>
 </html>

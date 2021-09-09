@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# WSTextMessageTornadoServer.py
+# chat_bot_server.py
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
@@ -9,11 +9,11 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
     # Override Event Functions
     def open(self):
         print('connection opened...')
-        self.write_message("The server says: 'Hello'. Connection was accepted.")
+        self.write_message('<p>kibacoのサポートチャットボットへようこそ</p><p>ここではチャットボットが、マニュアルやFAQの検索を助けてくれます。</p><p>調べたいことを入力して、「送信」ボタンを押してください。</p>')
 
     def on_message(self, message):
         print('received:', message)
-        self.write_message("The server return your message: " + message)
+        self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p>')
 
     def on_close(self):
         print('connection closed...')
