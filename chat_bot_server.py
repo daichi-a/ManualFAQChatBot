@@ -42,6 +42,9 @@ import pandas as pd
 # conda install -c huggingface transformers
 # で再インストールする
 
+# グローバル変数
+global bert_tokenizer, model_bert, df_embedding
+
 class chat_bot_server(tornado.websocket.WebSocketHandler):
     # Override Event Functions
     def open(self):
@@ -161,8 +164,13 @@ def initialize_bert_pre_traind_model():
 
 
 if __name__ == '__main__':
+    # 複数のWebSocketサーバのインスタンスから見るためにグローバル変数にしておく
+    # 読み込みと計算は起動じの1回でよいので
+    global bert_tokenizer, model_bert, df_embedding
+
     # ここで、CSVのマニュアルとFAQのデータを読み見込んで、初期化、各項目のタイトルと本文のBERT特徴量を算出しておく
-    initialize_bert_pre_traind_model()
+    bert_tokenizer, model_bert, df_embedding, initialize_bert_pre_traind_model()
+    
     # 特徴量の算出が終わったら、WebSocket Serverを起動
     # 応答できるようになる
     application = tornado.web.Application([('/kibaco_chat_bot', chat_bot_server)])
