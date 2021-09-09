@@ -42,9 +42,6 @@ import pandas as pd
 # conda install -c huggingface transformers
 # で再インストールする
 
-# グローバル変数
-global bert_tokenizer, model_bert, df_embedding
-
 class chat_bot_server(tornado.websocket.WebSocketHandler):
     # Override Event Functions
     def open(self):
@@ -119,7 +116,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
 
 def calc_embedding_last_layer(text):
-    global bert_tokenizer
+    global bert_tokenizer, model_bert, df_embedding
     # 特徴量抽出の関数の定義
     # やってることは最終層の出力を見るだけ
     # 最終層のレイヤーの出力。これをそのまま使うのは良くないと公式ドキュメントにあるそうな
@@ -134,6 +131,7 @@ def calc_embedding_last_layer(text):
 
 
 def initialize_bert_pre_traind_model():
+    global bert_tokenizer, model_bert, df_embedding
     # 東北大の。Tokenizerの形態素解析にMeCabを使用（MeCabを経由しているだけだが）
     bert_tokenizer = BertJapaneseTokenizer.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
     model_bert = BertModel.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
