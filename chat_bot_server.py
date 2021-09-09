@@ -69,7 +69,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         return True
 
     def search_items_by_bert_embedding(self, text):
-        global df_embedding
+        global df_embedding, df_csv
         print('serach item')
 
         # 既存のタイトルと一番近い距離のタイトルを検索
@@ -99,9 +99,9 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
         # 1番マッチした項目を持ってくる
         print(target_text, 'に対する答えは……')
-        print(df.loc[:, 'Title'][min_dist_index])
-        print(df.loc[:, 'Body'][min_dist_index])
-        print(df.loc[:, 'URL'][min_dist_index])
+        print(df_csv.loc[:, 'Title'][min_dist_index])
+        print(df_csv.loc[:, 'Body'][min_dist_index])
+        print(df_csv.loc[:, 'URL'][min_dist_index])
 
         # 2番目にマッチした項目を持ってくる
         min_dist_indexes = np.argsort(distances)[::-1]
@@ -109,15 +109,15 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         print('2番目に適合したindexは', min_dist_indexes[-2])
         second_min_dist_index = min_dist_indexes[-2]
 
-        print(df.loc[:, 'Title'][second_min_dist_index])
-        print(df.loc[:, 'Body'][second_min_dist_index])
-        print(df.loc[:, 'URL'][second_min_dist_index])
+        print(df_csv.loc[:, 'Title'][second_min_dist_index])
+        print(df_csv.loc[:, 'Body'][second_min_dist_index])
+        print(df_csv.loc[:, 'URL'][second_min_dist_index])
 
 
 
 
 def calc_embedding_last_layer(text):
-    global bert_tokenizer, model_bert, df_embedding
+    global bert_tokenizer, model_bert, df_embedding, df_csv
     # 特徴量抽出の関数の定義
     # やってることは最終層の出力を見るだけ
     # 最終層のレイヤーの出力。これをそのまま使うのは良くないと公式ドキュメントにあるそうな
@@ -132,7 +132,7 @@ def calc_embedding_last_layer(text):
 
 
 def initialize_bert_pre_traind_model():
-    global bert_tokenizer, model_bert, df_embedding
+    global bert_tokenizer, model_bert, df_embedding, df_csv
     # 東北大の。Tokenizerの形態素解析にMeCabを使用（MeCabを経由しているだけだが）
     bert_tokenizer = BertJapaneseTokenizer.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
     model_bert = BertModel.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
@@ -144,10 +144,10 @@ def initialize_bert_pre_traind_model():
     model_bert.eval()
 
     # CSVの読み込み
-    df = pd.read_csv('faqmanual_itemized.csv')
+    df_csv = pd.read_csv('faqmanual_itemized.csv')
 
     # 'Title'列だけを抽出
-    df_title_seq = df.loc[:, 'Title']
+    df_title_seq = df_csv.loc[:, 'Title']
 
     # 特徴量を格納するarrayを作り
     embedding_array = np.zeros((len(df_title_seq.values), 768), dtype=float)
