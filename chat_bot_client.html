@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!-- WSTextMessageJSClient.html -->
+
+<html lang="ja">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+
+  <title>kibaco manual FAQ chat bot</title>
+  <script type="text/javascript" src="WSTextMessageJSClient.js">
+  </script>
+  
+</head>
+<body>
+  <div id="controll_field">
+    <p>
+      <input type="button" value="接続開始" onclick="startConnection()" />
+      <input type="button" value="接続終了" onclick="exitConnection()" />
+    </p>
+    <form>
+      <input type="text" name="text_field" value="ここに入力して「送信」ボタンを押してください．" />
+      <input type="button" name="send_button" value="送信" onclick="sendMessage(this.form.elements['text_field'].value)" />
+    </form>
+  </div>
+  <div id="view_field">
+    <p>初期テキスト</p>
+  </div>
+</body>
+</html>
