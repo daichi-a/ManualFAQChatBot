@@ -12,13 +12,31 @@ from transformers import BertJapaneseTokenizer, BertModel
 import numpy as np
 
 # 必要なライブラリ
+# pipの場合（pipだと色々地獄を見そう）
 #!apt install aptitude swig
 #!aptitude install mecab libmecab-dev mecab-ipadic-utf8 git make curl xz-utils file -y
 #!pip install mecab-python3==0.996.5
 #!pip install unidic-lite
-#!pip install transformers
 #!pip install fugashi
 #!pip install ipadic
+#!pip install transformers==4.7.0-py3
+
+# condaの場合は、以下
+# conda環境は3.6で作る必要がある(3.7だとglibcのバージョンで2.29を要求される。Ubuntu 20.04LTSは標準が2.27)
+
+# conda create -n 環境名 python=3.6
+# conda activate 環境名
+# conda install -c conda-forge mecab-python3
+# conda install -c conda-forge unidic-lite
+# conda install -c pytorch cpuonly pytorch torchvision
+# conda install -c huggingface transformers
+# conda install tornado
+
+# numpyがダメになることがあるので、一度
+# conda uninstall numpyしておいて、
+# conda install numpy
+# conda install -c huggingface transformers
+# で再インストールする
 
 class chat_bot_server(tornado.websocket.WebSocketHandler):
     # Override Event Functions
