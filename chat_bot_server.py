@@ -10,6 +10,7 @@ import torch
 from transformers import BertJapaneseTokenizer, BertModel
 
 import numpy as np
+import pandas as pd
 
 # 必要なライブラリ
 # pipの場合（pipだと色々地獄を見そう）
@@ -32,6 +33,8 @@ import numpy as np
 # conda install -c pytorch cpuonly pytorch torchvision
 # conda install -c huggingface transformers
 # conda install tornado
+# conda install pandas
+# pip install fugashi ipadic
 
 # numpyがダメになることがあるので、一度
 # conda uninstall numpyしておいて、
