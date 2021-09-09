@@ -7,7 +7,7 @@ window.addEventListener('load', function(){
     // グローバル変数で(windowオブジェクトのプロパティとして)
     // WebSocketクラスのインスタンスを保持する変数を作っておく
     window.webSocket = null;
-    window.wsServerUrl = 'ws://localhost:30005/kibaco_chat_bot';
+    window.wsServerUrl = 'ws://nt-d.sd.tmu.ac.jp:30005/kibaco_chat_bot';
 }, false);
 
 window.addEventListener('unload', function(event){
