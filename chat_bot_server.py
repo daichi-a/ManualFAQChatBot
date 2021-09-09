@@ -169,8 +169,8 @@ if __name__ == '__main__':
     global bert_tokenizer, model_bert, df_embedding
 
     # ここで、CSVのマニュアルとFAQのデータを読み見込んで、初期化、各項目のタイトルと本文のBERT特徴量を算出しておく
-    bert_tokenizer, model_bert, df_embedding, initialize_bert_pre_traind_model()
-    
+    bert_tokenizer, model_bert, df_embedding = initialize_bert_pre_traind_model()
+
     # 特徴量の算出が終わったら、WebSocket Serverを起動
     # 応答できるようになる
     application = tornado.web.Application([('/kibaco_chat_bot', chat_bot_server)])
