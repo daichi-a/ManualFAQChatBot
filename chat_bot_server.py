@@ -22,7 +22,8 @@ import numpy as np
 #!pip install transformers==4.7.0-py3
 
 # condaの場合は、以下
-# conda環境は3.6で作る必要がある(3.7だとglibcのバージョンで2.29を要求される。Ubuntu 20.04LTSは標準が2.27)
+# Ubuntu18.04LTSのconda環境は3.6で作る必要がある
+# 3.7だとglibcのバージョンで2.29を要求される。Ubuntu 18.04LTSは標準が2.27
 
 # conda create -n 環境名 python=3.6
 # conda activate 環境名
