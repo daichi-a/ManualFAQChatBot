@@ -98,34 +98,27 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         # 2つの配列を作って距離を取るアルゴリズムに変更する必要がある
         # xxとyyの配列をコントロールすることでforで回さなくてもよさそう
 
-        # 1番マッチした項目を持ってくる
-        min_dist_index = np.argmin(distances)
-        print(min_dist_index)
+        # マッチした項目を持ってくる
+        #min_dist_index = np.argmin(distances)
+        #print(min_dist_index)
 
-        print(target_text, 'に対する答えは……')
-        first_title = df_csv.loc[:, 'Title'][min_dist_index]
-        print(first_title)
-        #first_body = df_csv.loc[:, 'Body'][min_dist_index]
-        #print(first_body)
-        first_url = df_csv.loc[:, 'URL'][min_dist_index]
-        print(first_url)
-
-        # 2番目にマッチした項目を持ってくる
         min_dist_indexes = np.argsort(distances)[::-1]
-        print(min_dist_indexes)
-        print('2番目に適合したindexは', min_dist_indexes[-2])
-        second_min_dist_index = min_dist_indexes[-2]
+        min_6_index = min_dist_indexes[-1:-6]
+        
+        title_list = df_csv.loc[:, 'Title']
+        title_min_6_list = []
+        url_list = df_csv.loc[:, 'URL']
+        url_min_6_list = []
 
-        second_title = df_csv.loc[:, 'Title'][second_min_dist_index]
-        print(second_title)
-        #second_body = df_csv.loc[:, 'Body'][second_min_dist_index]
-        #print(second_body)
-        second_url = df_csv.loc[:, 'URL'][second_min_dist_index]
-        print(second_url)
+        result_text = ""
+        for i, index in enumerate(min_6_dist):
+            title_min_6_list.append(title_list[index])
+            url_min_6_list.append(url_list[index])
 
-        # result_text = '<p>候補1</p><p>' + first_title + '</p><p>' + first_body + '</p></p><a target="_blank" href="' + first_url + '">' + first_url + '</a></p>' + '<p>候補2</p><p>' + second_title + '</p><p>' + second_body + '</p></p><a target="_blank" href="' + second_url + '">' + second_url + '</a></p>'
+            result_text = result_text + '<p>候補' + str(i) + '</p><p>' + title_list[index] + '</p></p><a target="_blank" href="' + url_list[index] + '">' + first_url[index] + '</a></p>'
 
-        result_text = '<p>候補1</p><p>' + first_title + '</p></p><a target="_blank" href="' + first_url + '">' + first_url + '</a></p>' + '<p>候補2</p><p>' + second_title + '</p></p><a target="_blank" href="' + second_url + '">' + second_url + '</a></p>'
+
+        #result_text = '<p>候補1</p><p>' + first_title + '</p></p><a target="_blank" href="' + first_url + '">' + first_url + '</a></p>' + '<p>候補2</p><p>' + second_title + '</p></p><a target="_blank" href="' + second_url + '">' + second_url + '</a></p>'
 
         return result_text
 
