@@ -76,11 +76,25 @@ class paragraph_parser(HTMLParser): #HTMLParserを継承したクラスを定義
             # テキストデータがタグで囲まれている時に呼び出される
             # どうやらスペースが入ってても呼び出されるらしい
             # なので最初に，' '(半角スペース)を''(何も入っていない文字)で置き換える
-            new_data = data.replace(' ', '')
-            if new_data != 'kibacoログイン':
-                if len(new_data) > 0:
-                    print('Some Data:', new_data)
-                    self.__data_list.append(new_data)
+            paragraph_string = data.replace(' ', '')
+            if paragraph_string != 'kibacoログイン':
+                if len(paragraph_string) > 0:
+                    paragraph_string = paragraph_string.replace('.', '')
+                    paragraph_string = re.sub(r'[0-9]+', '', paragraph_string)
+                    paragraph_string = re.sub(r'-', '', paragraph_string)
+                    paragraph_string = re.sub(r'\n', '', paragraph_string)
+                    paragraph_string = re.sub(r'\xa9', '', paragraph_string)
+                    paragraph_string = re.sub(r'\uf06c', '', paragraph_string)
+                    paragraph_string = re.sub(r'\u2003', '', paragraph_string)
+                    paragraph_string = re.sub(r'\u3000', '', paragraph_string)
+
+                    paragraph_string = re.sub(r'CopyrightTokyoMetropolitanUniversity.', '', paragraph_string)
+                    paragraph_string = re.sub(r'Copyright2015TokyoMetropolitanUniversity.', '', paragraph_string)
+                    
+                    
+                    if len(paragraph_string) > 0:
+                        print('Some Data:', paragraph_string)
+                        self.__data_list.append(paragraph_string)
 
     # Override
     def handle_endtag(self, tag):
@@ -131,17 +145,8 @@ if __name__ == "__main__":
         #print(data_list)
 
         for index, a_paragraph in enumerate(data_list):
-            paragraph_string = re.sub(r'[0-9]+', '', a_paragraph)
-            paragraph_string = re.sub(r'-', '', paragraph_string)
-            paragraph_string = re.sub(r'\n', '', paragraph_string)
-            paragraph_string = re.sub(r'\xa9', '', paragraph_string)
-            paragraph_string = re.sub(r'\uf06c', '', paragraph_string)
-            paragraph_string = re.sub(r'\u2003', '', paragraph_string)
-            paragraph_string = re.sub(r'\u3000', '', paragraph_string)
-
-            paragraph_string = re.sub(r'Copyright2015TokyoMetropolitanUniversity', '', paragraph_string)
-            paragrah_string = paragraph_string.replace('.', '')
-            data_list[index] = paragraph_string
+            if len(a_paragraph) > 0:
+                data_list[index] = a_paragraph
 
         page_title = data_list[0]
         print(page_title)
