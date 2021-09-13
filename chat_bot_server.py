@@ -51,6 +51,8 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         print('received:', message)
 
+        self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p><p><strong>検索中です……</strong></p>')
+
         result_text = self.search_items_by_bert_embedding(message)
 
         self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p>' + result_text)
@@ -70,7 +72,9 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
     def search_items_by_bert_embedding(self, text):
         global df_embedding, df_csv
-        print('serach item')
+        print('serach item. ')
+
+
 
         # 既存のタイトルと一番近い距離のタイトルを検索
 
