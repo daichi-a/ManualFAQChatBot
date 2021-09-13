@@ -91,7 +91,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
         print(distances)
 
-        min_dist_indexes = np.argsort(distances)
+        min_dist_indexes = np.argsort(distances)[::-1]
         min_6_indexes = min_dist_indexes[0:6]
 
         #all_embedding = np.vstack((df_embedding, target_embedding))
