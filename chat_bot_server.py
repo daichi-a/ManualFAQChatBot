@@ -81,18 +81,28 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         target_text = text
         target_embedding = calc_embedding_last_layer(target_text)
 
-        all_embedding = np.vstack((df_embedding, target_embedding))
+
+        
+
+        embedding_dist_list = []
+        for a_vec in df_embedding:
+            embedding_list.append(np.linalg.norm(target_embedding, df_embedding))
+        distances = np.array(embedding_dist_list)
+        min_dist_indexes = np.argsort(distances)
+        min_6_distances = min_dist_indexes[0:6]
+
+        #all_embedding = np.vstack((df_embedding, target_embedding))
         # お尻にvstackする。
 
         # ベクトル間の距離の計算
         # https://sekailab.com/wp/2018/06/11/numpy-combinatorial-calculation-in-array/
 
-        tmp_index = np.arange(all_embedding.shape[0])
-        xx, yy = np.meshgrid(tmp_index, tmp_index)
-        distances = np.linalg.norm(all_embedding[xx]-all_embedding[yy], axis=2)[-1][:-1]
+        #tmp_index = np.arange(all_embedding.shape[0])
+        #xx, yy = np.meshgrid(tmp_index, tmp_index)
+        #distances = np.linalg.norm(all_embedding[xx]-all_embedding[yy], axis=2)[-1][:-1]
         # 当たり前だがケツは検索文同士の距離なので取り除いて、
-        print(len(distances))
-        print(distances)
+        #print(len(distances))
+        #print(distances)
 
         # 項目が増えると指数関数的にオーダーが増えてその大部分はいらない距離なので
         # 2つの配列を作って距離を取るアルゴリズムに変更する必要がある
@@ -102,10 +112,10 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         #min_dist_index = np.argmin(distances)
         #print(min_dist_index)
 
-        min_dist_indexes = np.argsort(distances)[::-1]
-        min_6_indexes = min_dist_indexes[-6:-1]
-        print(np.argsort(distances)[::-1][-1])
-        print(min_6_indexes)
+        #min_dist_indexes = np.argsort(distances)[::-1]
+        #min_6_indexes = min_dist_indexes[-6:-1]
+        #print(np.argsort(distances)[::-1][-1])
+        #print(min_6_indexes)
         
         title_list = df_csv.loc[:, 'Title']
         title_min_6_list = []
@@ -113,7 +123,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         url_min_6_list = []
 
         result_text = ""
-        for i, index in enumerate(reversed(min_6_indexes)):
+        for i, index in enumerate(min_6_indexes):
             title_min_6_list.append(title_list[index])
             url_min_6_list.append(url_list[index])
 
