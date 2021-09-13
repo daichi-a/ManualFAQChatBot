@@ -157,17 +157,15 @@ def initialize_bert_pre_traind_model():
     # CSVの読み込み
     df_csv = pd.read_csv('url_data.csv')
 
-    # 'Title'列だけを抽出
-    #df_title_seq = df_csv.loc[:, ['Title0', 'Title1', 'Title2', 'Title3']]
+    # 'Data'列だけを抽出
     df_title_seq = df_csv.loc[:, 'Data']
 
     # 特徴量を格納するarrayを作り
-    #embedding_array = np.zeros((len(df_title_seq.values), 4, 768), dtype=float)
     embedding_array = np.zeros((len(df_title_seq.values), 768), dtype=float)
 
     # 特徴量の抽出
-    for index, title in np.ndenumerate(df_title_seq.values):
-        embedding_array[index] = calc_embedding_last_layer(title)
+    for index, data in np.ndenumerate(df_title_seq.values):
+        embedding_array[index] = calc_embedding_last_layer(data)
 
 
     df_embedding = pd.DataFrame(embedding_array)
