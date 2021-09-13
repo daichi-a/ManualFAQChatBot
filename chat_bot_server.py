@@ -99,7 +99,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         print(min_dist_index)
 
         print(target_text, 'に対する答えは……')
-        first_title = df_csv.loc[:, 'Title'][min_dist_index]
+        first_title = df_csv.loc[:, 'Title0'][min_dist_index]
         print(first_title)
         first_body = df_csv.loc[:, 'Body'][min_dist_index]
         print(first_body)
