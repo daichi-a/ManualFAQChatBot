@@ -49,7 +49,43 @@ class get_manual_pages_url(HTMLParser): #HTMLParserを継承したクラスを�
     def get_url_list(self):
         return self.__link_url_array
 
+class get_headings(HTMLParser): #HTMLParserを継承したクラスを定義
 
+    # 定数やインスタンス内で値が変わらないstaticメンバ変数はクラス宣言の後に宣言する
+    # 頭に「__」が付くと変数も関数もprivate扱いになる
+    def __init__(self, url):
+        # コンストラクタ
+        super().__init__() #親クラスのコンストラクタを実行
+        self.__heading_list = []
+        self.__url = url
+        self.__in_heading = False
+
+    # Override
+    def handle_starttag(self, tag, attrs):
+        # print('Start Tag:', tag)
+        if tag == 'h2' or tag == 'h3':
+            self.__in_heading = True
+
+    # Override
+    def handle_data(self, data):
+        if self.__in_heading == True:
+            # h2とh3には具体的にやりたいことの内容が入っているので、これをリンクと一緒に取り出す
+            # ついでに受講者向けか教員向けかを取り出す
+            # テキストデータがタグで囲まれている時に呼び出される
+            # どうやらスペースが入ってても呼び出されるらしい
+            # なので最初に，' '(半角スペース)を''(何も入っていない文字)で置き換える
+            new_data = data.replace(' ', '')
+            if len(new_data) > 0:
+                # print('Some Data:', new_data)
+                self.__heading_list.append(new_data)
+
+    # Override
+    def handle_endtag(self, tag):
+        # print('End Tag:', tag)
+        self.__in_heading = False
+
+    def get_heading_list(self):
+        return self.__heading_list
 
                     
 if __name__ == "__main__":
@@ -77,8 +113,21 @@ if __name__ == "__main__":
     
     print('hyper link to other site appears', get_urls.get_counter(), 'times')
 
-    manuarl_url_list = get_urls.get_url_list()
-    
+    manual_url_list = get_urls.get_url_list()
+
+    title_url_list = []
+    for a_url in manual_url_list:
+        gotten_http_response = urllib.request.urlopen(a_url)
+        get_titles = get_headings(url)
+        get_titles.feed(gotten_http_response.read().decode('utf-8'))
+        title_url_list = get_titles.get_heading_list()
+        title_url_list.insert(0, a_url)
+
+        print(title_url_list)
+        get_titles.close()
+        gotten_http_response.close()
 
     get_urls.close() #デストラクタを呼ぶ
     gotten_http_response.close()
+
+    print(title_url_list)
