@@ -72,9 +72,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
     def search_items_by_bert_embedding(self, text):
         global df_embedding, df_csv
-        print('serach item. ')
-
-
+        print('seraching items... ')
 
         # 既存のタイトルと一番近い距離のタイトルを検索
 
@@ -88,38 +86,11 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         for a_vec in df_embedding.values:
             embedding_dist_list.append(np.linalg.norm(target_embedding - a_vec))
         distances = np.array(embedding_dist_list)
-
-        print(distances)
-
-        #min_dist_indexes = np.argsort(distances)[::-1]
-        min_dist_indexes = np.argsort(distances)
-        min_6_indexes = min_dist_indexes[0:6]
-
-        #all_embedding = np.vstack((df_embedding, target_embedding))
-        # お尻にvstackする。
-
-        # ベクトル間の距離の計算
-        # https://sekailab.com/wp/2018/06/11/numpy-combinatorial-calculation-in-array/
-
-        #tmp_index = np.arange(all_embedding.shape[0])
-        #xx, yy = np.meshgrid(tmp_index, tmp_index)
-        #distances = np.linalg.norm(all_embedding[xx]-all_embedding[yy], axis=2)[-1][:-1]
-        # 当たり前だがケツは検索文同士の距離なので取り除いて、
-        #print(len(distances))
         #print(distances)
 
-        # 項目が増えると指数関数的にオーダーが増えてその大部分はいらない距離なので
-        # 2つの配列を作って距離を取るアルゴリズムに変更する必要がある
-        # xxとyyの配列をコントロールすることでforで回さなくてもよさそう
-
-        # マッチした項目を持ってくる
-        #min_dist_index = np.argmin(distances)
-        #print(min_dist_index)
-
-        #min_dist_indexes = np.argsort(distances)[::-1]
-        #min_6_indexes = min_dist_indexes[-6:-1]
-        #print(np.argsort(distances)[::-1][-1])
-        print(min_6_indexes)
+        min_dist_indexes = np.argsort(distances)
+        min_6_indexes = min_dist_indexes[0:6]
+        #print(min_6_indexes)
         
         title_list = df_csv.loc[:, 'Title']
         title_min_6_list = []
@@ -132,11 +103,9 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
             url_min_6_list.append(url_list[index])
 
             current_result = '<p>候補' + str(i) + '</p><p>' + title_list[index] + '</p></p><a target="_blank" href="' + url_list[index] + '">' + url_list[index] + '</a></p>'
-            print(current_result)
+            # print(current_result)
 
             result_text = result_text + current_result
-
-        #result_text = '<p>候補1</p><p>' + first_title + '</p></p><a target="_blank" href="' + first_url + '">' + first_url + '</a></p>' + '<p>候補2</p><p>' + second_title + '</p></p><a target="_blank" href="' + second_url + '">' + second_url + '</a></p>'
 
         return result_text
 
@@ -178,11 +147,12 @@ def initialize_bert_pre_traind_model():
     # 特徴量を格納するarrayを作り
     embedding_array = np.zeros((len(df_title_seq.values), 768), dtype=float)
 
+    print('Calc Embedding')
     # 特徴量の抽出
     for index, data in np.ndenumerate(df_title_seq.values):
         embedding_array[index] = calc_embedding_last_layer(data)
 
-
+    print('Finish Calc Embedding')
     df_embedding = pd.DataFrame(embedding_array)
 
 
