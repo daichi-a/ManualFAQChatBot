@@ -116,7 +116,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
             title_min_6_list.append(title_list[index])
             url_min_6_list.append(url_list[index])
 
-            current_resut = '<p>候補' + str(i) + '</p><p>' + title_list[index] + '</p></p><a target="_blank" href="' + url_list[index] + '">' + first_url[index] + '</a></p>'
+            current_resut = '<p>候補' + str(i) + '</p><p>' + title_list[index] + '</p></p><a target="_blank" href="' + url_list[index] + '">' + url_list[index] + '</a></p>'
             print(current_result)
 
             result_text = result_text + current_result
