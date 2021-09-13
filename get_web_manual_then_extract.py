@@ -165,6 +165,7 @@ if __name__ == "__main__":
         writer = csv.writer(f)
         writer.writerow(head_row)
         writer.writerows(row_list)
+    f.close()
 
     print('最大列幅', max_row_length)
     print(row_list)

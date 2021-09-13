@@ -153,10 +153,10 @@ def initialize_bert_pre_traind_model():
     model_bert.eval()
 
     # CSVの読み込み
-    df_csv = pd.read_csv('faqmanual_itemized.csv')
+    df_csv = pd.read_csv('url_title.csv')
 
     # 'Title'列だけを抽出
-    df_title_seq = df_csv.loc[:, 'Title']
+    df_title_seq = df_csv.loc[:, ['Title0', 'Title1', 'Title2', 'Title3']]
 
     # 特徴量を格納するarrayを作り
     embedding_array = np.zeros((len(df_title_seq.values), 768), dtype=float)
