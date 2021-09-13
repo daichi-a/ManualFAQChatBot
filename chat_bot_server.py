@@ -104,6 +104,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
         min_dist_indexes = np.argsort(distances)[::-1]
         min_6_indexes = min_dist_indexes[-1:-6]
+        print(min_6_indexes)
         
         title_list = df_csv.loc[:, 'Title']
         title_min_6_list = []
