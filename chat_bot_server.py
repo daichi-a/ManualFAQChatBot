@@ -81,16 +81,14 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         target_text = text
         target_embedding = calc_embedding_last_layer(target_text)
 
+        #target_embedding_copied = np.full(target_embedding, 768)
+        #distances = np.linalg.norm(target_embedding_copied - df_embedding)        
 
-        
+        embedding_dist_list = []
+        for a_vec in df_embedding:
+            embedding_dist_list.append(np.linalg.norm(target_embedding - a_vec))
+        distances = np.array(embedding_dist_list)
 
-        #embedding_dist_list = []
-        #for a_vec in df_embedding:
-        #    embedding_dist_list.append(np.linalg.norm(target_embedding, df_embedding))
-
-        target_embedding_copied = np.full(target_embedding, 768)
-
-        distances = np.linalg.norm(target_embedding_copied - df_embedding)
         min_dist_indexes = np.argsort(distances)
         min_6_distances = min_dist_indexes[0:6]
 
