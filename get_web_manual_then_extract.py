@@ -2,6 +2,9 @@
 import urllib.request 
 from html.parser import HTMLParser
 
+import re
+import csv
+
 class get_manual_pages_url(HTMLParser): #HTMLParserを継承したクラスを定義
     def __init__(self, my_domain):
         # コンストラクタ
@@ -115,19 +118,53 @@ if __name__ == "__main__":
 
     manual_url_list = get_urls.get_url_list()
 
+    row_list = []
+
     title_url_list = []
+    max_row_length = 0
     for a_url in manual_url_list:
         gotten_http_response = urllib.request.urlopen(a_url)
         get_titles = get_headings(url)
         get_titles.feed(gotten_http_response.read().decode('utf-8'))
         title_url_list = get_titles.get_heading_list()
+        for index, a_title in enumerate(title_url_list):
+            title_string = re.sub(r'[0-9]+', '', a_title)
+            title_string = re.sub(r'-', '', title_string)
+            title_string = title_string.replace('.', '')
+            title_url_list[index] = title_string
         title_url_list.insert(0, a_url)
+        row_length = len(title_url_list)
+        # title_url_list.insert(0, row_length)
+        #print('列幅', row_length)
 
-        print(title_url_list)
+        if row_length > max_row_length:
+            max_row_length = row_length
+            #print('最大列幅', max_row_length)
+
+        row_list.append(title_url_list)
+        # print(title_url_list)
         get_titles.close()
         gotten_http_response.close()
 
     get_urls.close() #デストラクタを呼ぶ
     gotten_http_response.close()
 
-    print(title_url_list)
+    for a_row in row_list:
+        minus = max_row_length - len(a_row)
+        for i in range(minus):
+            a_row.append('-1')
+
+    # CSVファイルへ書き込み
+
+    head_row = []
+    head_row.append('URL')
+    for i in range(max_row_length - 1):
+        head_row.append('Title' + str(i))
+
+    with open('./url_title.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(head_row)
+        writer.writerows(row_list)
+
+    print('最大列幅', max_row_length)
+    print(row_list)
