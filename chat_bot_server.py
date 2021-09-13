@@ -99,7 +99,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         print(min_dist_index)
 
         print(target_text, 'に対する答えは……')
-        first_title = df_csv.loc[:, 'Title0'][min_dist_index]
+        first_title = df_csv.loc[:, 'Title'][min_dist_index]
         print(first_title)
         #first_body = df_csv.loc[:, 'Body'][min_dist_index]
         #print(first_body)
@@ -112,7 +112,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         print('2番目に適合したindexは', min_dist_indexes[-2])
         second_min_dist_index = min_dist_indexes[-2]
 
-        second_title = df_csv.loc[:, 'Title0'][second_min_dist_index]
+        second_title = df_csv.loc[:, 'Title'][second_min_dist_index]
         print(second_title)
         #second_body = df_csv.loc[:, 'Body'][second_min_dist_index]
         #print(second_body)
@@ -159,7 +159,7 @@ def initialize_bert_pre_traind_model():
 
     # 'Title'列だけを抽出
     #df_title_seq = df_csv.loc[:, ['Title0', 'Title1', 'Title2', 'Title3']]
-    df_title_seq = df_csv.loc[:, 'Title0']
+    df_title_seq = df_csv.loc[:, 'Data']
 
     # 特徴量を格納するarrayを作り
     #embedding_array = np.zeros((len(df_title_seq.values), 4, 768), dtype=float)

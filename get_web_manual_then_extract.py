@@ -52,43 +52,44 @@ class get_manual_pages_url(HTMLParser): #HTMLParserを継承したクラスを�
     def get_url_list(self):
         return self.__link_url_array
 
-class get_headings(HTMLParser): #HTMLParserを継承したクラスを定義
+class paragraph_parser(HTMLParser): #HTMLParserを継承したクラスを定義
 
     # 定数やインスタンス内で値が変わらないstaticメンバ変数はクラス宣言の後に宣言する
     # 頭に「__」が付くと変数も関数もprivate扱いになる
     def __init__(self, url):
         # コンストラクタ
         super().__init__() #親クラスのコンストラクタを実行
-        self.__heading_list = []
+        self.__data_list = []
         self.__url = url
-        self.__in_heading = False
+        self.__in_tag = False
 
     # Override
     def handle_starttag(self, tag, attrs):
         # print('Start Tag:', tag)
-        if tag == 'h2' or tag == 'h3':
-            self.__in_heading = True
+        if tag == 'h2' or tag == 'h3' or tag == 'p':
+            self.__in_tag = True
 
     # Override
     def handle_data(self, data):
-        if self.__in_heading == True:
-            # h2とh3には具体的にやりたいことの内容が入っているので、これをリンクと一緒に取り出す
-            # ついでに受講者向けか教員向けかを取り出す
+        if self.__in_tag == True:
+            # h2とh3とpの中には具体的にやりたいことの内容が入っているので、これをリンクと一緒に取り出す
             # テキストデータがタグで囲まれている時に呼び出される
             # どうやらスペースが入ってても呼び出されるらしい
             # なので最初に，' '(半角スペース)を''(何も入っていない文字)で置き換える
             new_data = data.replace(' ', '')
-            if len(new_data) > 0:
-                # print('Some Data:', new_data)
-                self.__heading_list.append(new_data)
+            if new_data != 'kibacoログイン':
+                if len(new_data) > 0:
+                    print('Some Data:', new_data)
+                    self.__data_list.append(new_data)
 
     # Override
     def handle_endtag(self, tag):
         # print('End Tag:', tag)
-        self.__in_heading = False
+        self.__in_tag = False
 
-    def get_heading_list(self):
-        return self.__heading_list
+    def get_paragraph_list(self):
+        #print(self.__data_list)
+        return self.__data_list
 
                     
 if __name__ == "__main__":
@@ -124,44 +125,43 @@ if __name__ == "__main__":
     max_row_length = 0
     for a_url in manual_url_list:
         gotten_http_response = urllib.request.urlopen(a_url)
-        get_titles = get_headings(url)
-        get_titles.feed(gotten_http_response.read().decode('utf-8'))
-        title_url_list = get_titles.get_heading_list()
-        for index, a_title in enumerate(title_url_list):
-            title_string = re.sub(r'[0-9]+', '', a_title)
-            title_string = re.sub(r'-', '', title_string)
-            title_string = title_string.replace('.', '')
-            title_url_list[index] = title_string
-        title_url_list.insert(0, a_url)
-        row_length = len(title_url_list)
-        # title_url_list.insert(0, row_length)
-        #print('列幅', row_length)
+        get_paragraph = paragraph_parser(url)
+        get_paragraph.feed(gotten_http_response.read().decode('utf-8'))
+        data_list = get_paragraph.get_paragraph_list()
+        #print(data_list)
 
-        if row_length > max_row_length:
-            max_row_length = row_length
-            #print('最大列幅', max_row_length)
+        for index, a_paragraph in enumerate(data_list):
+            paragraph_string = re.sub(r'[0-9]+', '', a_paragraph)
+            paragraph_string = re.sub(r'-', '', paragraph_string)
+            paragraph_string = re.sub(r'\n', '', paragraph_string)
+            paragraph_string = re.sub(r'\xa9', '', paragraph_string)
+            paragraph_string = re.sub(r'\uf06c', '', paragraph_string)
+            paragraph_string = re.sub(r'\u2003', '', paragraph_string)
+            paragraph_string = re.sub(r'\u3000', '', paragraph_string)
 
-        row_list.append(title_url_list)
-        # print(title_url_list)
-        get_titles.close()
+            paragraph_string = re.sub(r'Copyright2015TokyoMetropolitanUniversity', '', paragraph_string)
+            paragrah_string = paragraph_string.replace('.', '')
+            data_list[index] = paragraph_string
+
+        page_title = data_list[0]
+        print(page_title)
+
+        for a_paragraph in data_list:
+            row_list.append([a_url, page_title, a_paragraph])
+
+        #print(row_list)
+
+        get_paragraph.close()
         gotten_http_response.close()
 
     get_urls.close() #デストラクタを呼ぶ
     gotten_http_response.close()
 
-    for a_row in row_list:
-        minus = max_row_length - len(a_row)
-        for i in range(minus):
-            a_row.append('-1')
-
     # CSVファイルへ書き込み
 
-    head_row = []
-    head_row.append('URL')
-    for i in range(max_row_length - 1):
-        head_row.append('Title' + str(i))
+    head_row = ['URL', 'Title', 'Data']
 
-    with open('./url_title.csv', 'w') as f:
+    with open('./url_data.csv', 'w') as f:
         writer = csv.writer(f)
         writer.writerow(head_row)
         writer.writerows(row_list)
