@@ -96,13 +96,16 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         title_min_6_list = []
         url_list = df_csv.loc[:, 'URL']
         url_min_6_list = []
+        key_sentence_list = df_csv.loc[:, 'Data']
+        key_sentence_min_6_list = []
 
         result_text = ""
         for i, index in enumerate(min_6_indexes):
             title_min_6_list.append(title_list[index])
             url_min_6_list.append(url_list[index])
+            key_sentence_min_6_list.append(key_sentence_list[index])
 
-            current_result = '<p>候補' + str(i) + '</p><p>' + title_list[index] + '</p></p><a target="_blank" href="' + url_list[index] + '">' + url_list[index] + '</a></p>'
+            current_result = '<p>候補' + str(i) + '</p><p>' + title_list[index] + '</p><p>マッチした文:' + key_sentence_list[index] + '</p><p><a target="_blank" href="' + url_list[index] + '">' + url_list[index] + '</a></p>'
             # print(current_result)
 
             result_text = result_text + current_result
