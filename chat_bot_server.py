@@ -155,7 +155,7 @@ def initialize_bert_pre_traind_model():
     model_bert.eval()
 
     # CSVの読み込み
-    df_csv = pd.read_csv('url_title.csv')
+    df_csv = pd.read_csv('url_data.csv')
 
     # 'Title'列だけを抽出
     #df_title_seq = df_csv.loc[:, ['Title0', 'Title1', 'Title2', 'Title3']]
