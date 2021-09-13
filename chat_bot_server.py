@@ -84,10 +84,13 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
         
 
-        embedding_dist_list = []
-        for a_vec in df_embedding:
-            embedding_list.append(np.linalg.norm(target_embedding, df_embedding))
-        distances = np.array(embedding_dist_list)
+        #embedding_dist_list = []
+        #for a_vec in df_embedding:
+        #    embedding_dist_list.append(np.linalg.norm(target_embedding, df_embedding))
+
+        target_embedding_copied = np.full_like(target_embedding, df_embedding)
+
+        distances = np.linalg.norm(target_embedding_copied - df_embedding)
         min_dist_indexes = np.argsort(distances)
         min_6_distances = min_dist_indexes[0:6]
 
@@ -115,7 +118,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         #min_dist_indexes = np.argsort(distances)[::-1]
         #min_6_indexes = min_dist_indexes[-6:-1]
         #print(np.argsort(distances)[::-1][-1])
-        #print(min_6_indexes)
+        print(min_6_indexes)
         
         title_list = df_csv.loc[:, 'Title']
         title_min_6_list = []
