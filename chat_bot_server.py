@@ -112,7 +112,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         url_min_6_list = []
 
         result_text = ""
-        for index in reversed(min_6_indexes):
+        for i, index in enumerate(reversed(min_6_indexes)):
             title_min_6_list.append(title_list[index])
             url_min_6_list.append(url_list[index])
 
