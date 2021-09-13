@@ -101,8 +101,8 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         print(target_text, 'に対する答えは……')
         first_title = df_csv.loc[:, 'Title0'][min_dist_index]
         print(first_title)
-        first_body = df_csv.loc[:, 'Body'][min_dist_index]
-        print(first_body)
+        #first_body = df_csv.loc[:, 'Body'][min_dist_index]
+        #print(first_body)
         first_url = df_csv.loc[:, 'URL'][min_dist_index]
         print(first_url)
 
@@ -112,14 +112,16 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         print('2番目に適合したindexは', min_dist_indexes[-2])
         second_min_dist_index = min_dist_indexes[-2]
 
-        second_title = df_csv.loc[:, 'Title'][second_min_dist_index]
+        second_title = df_csv.loc[:, 'Title0'][second_min_dist_index]
         print(second_title)
-        second_body = df_csv.loc[:, 'Body'][second_min_dist_index]
-        print(second_body)
+        #second_body = df_csv.loc[:, 'Body'][second_min_dist_index]
+        #print(second_body)
         second_url = df_csv.loc[:, 'URL'][second_min_dist_index]
         print(second_url)
 
-        result_text = '<p>候補1</p><p>' + first_title + '</p><p>' + first_body + '</p></p><a target="_blank" href="' + first_url + '">' + first_url + '</a></p>' + '<p>候補2</p><p>' + second_title + '</p><p>' + second_body + '</p></p><a target="_blank" href="' + second_url + '">' + second_url + '</a></p>'
+        # result_text = '<p>候補1</p><p>' + first_title + '</p><p>' + first_body + '</p></p><a target="_blank" href="' + first_url + '">' + first_url + '</a></p>' + '<p>候補2</p><p>' + second_title + '</p><p>' + second_body + '</p></p><a target="_blank" href="' + second_url + '">' + second_url + '</a></p>'
+
+        result_text = '<p>候補1</p><p>' + first_title + '</p></p><a target="_blank" href="' + first_url + '">' + first_url + '</a></p>' + '<p>候補2</p><p>' + second_title + '</p></p><a target="_blank" href="' + second_url + '">' + second_url + '</a></p>'
 
         return result_text
 
