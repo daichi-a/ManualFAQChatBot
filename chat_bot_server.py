@@ -161,7 +161,7 @@ def initialize_bert_pre_traind_model():
 
     # 特徴量を格納するarrayを作り
     #embedding_array = np.zeros((len(df_title_seq.values), 4, 768), dtype=float)
-    embedding_array = np.zeros((len(df_title_seq.values)), 768, dtype=float)
+    embedding_array = np.zeros((len(df_title_seq.values), 768), dtype=float)
 
     # 特徴量の抽出
     for index, title in np.ndenumerate(df_title_seq.values):
