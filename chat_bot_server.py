@@ -89,6 +89,8 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
             embedding_dist_list.append(np.linalg.norm(target_embedding - a_vec))
         distances = np.array(embedding_dist_list)
 
+        print(distances)
+        
         min_dist_indexes = np.argsort(distances)
         min_6_indexes = min_dist_indexes[0:6]
 
