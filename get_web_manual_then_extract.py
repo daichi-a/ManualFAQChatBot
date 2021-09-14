@@ -84,12 +84,13 @@ class paragraph_parser(HTMLParser): #HTMLParserを継承したクラスを定義
                     paragraph_string = re.sub(r'-', '', paragraph_string)
                     paragraph_string = re.sub(r'\n', '', paragraph_string)
                     paragraph_string = re.sub(r'\xa9', '', paragraph_string)
+                    paragraph_string = re.sub(r'\0x83', '', paragraph_string)
                     paragraph_string = re.sub(r'\uf06c', '', paragraph_string)
                     paragraph_string = re.sub(r'\u2003', '', paragraph_string)
                     paragraph_string = re.sub(r'\u3000', '', paragraph_string)
 
-                    paragraph_string = re.sub(r'CopyrightTokyoMetropolitanUniversity.', '', paragraph_string)
-                    paragraph_string = re.sub(r'Copyright2015TokyoMetropolitanUniversity.', '', paragraph_string)
+                    paragraph_string = re.sub(r'CopyrightTokyoMetropolitanUniversity', '', paragraph_string)
+                    paragraph_string = re.sub(r'Copyright2015TokyoMetropolitanUniversity', '', paragraph_string)
                     
                     
                     if len(paragraph_string) > 0:
@@ -133,7 +134,9 @@ if __name__ == "__main__":
 
     manual_url_list = get_urls.get_url_list()
 
-    row_list = []
+    url_title_paragraph_list = []
+    url_title_body_list = []
+    body_list = []
 
     title_url_list = []
     max_row_length = 0
@@ -151,10 +154,12 @@ if __name__ == "__main__":
         page_title = data_list[0]
         print(page_title)
 
+        paragraph_list = []
         for a_paragraph in data_list:
-            row_list.append([a_url, page_title, a_paragraph])
+            url_title_paragraph_list.append([a_url, page_title, a_paragraph])
+            paragraph_list.append(a_paragraph)
 
-        #print(row_list)
+        url_title_body_list.append([a_url, page_title, ' '.join(paragraph_list)])
 
         get_paragraph.close()
         gotten_http_response.close()
@@ -164,13 +169,16 @@ if __name__ == "__main__":
 
     # CSVファイルへ書き込み
 
-    head_row = ['URL', 'Title', 'Data']
+    head_row = ['URL', 'Title', 'Paragraph']
 
-    with open('./url_data.csv', 'w') as f:
+    with open('./url_title_paragraph_data.csv', 'w', encoding='utf_8_sig') as f:
         writer = csv.writer(f)
         writer.writerow(head_row)
-        writer.writerows(row_list)
+        writer.writerows(url_title_paragraph_list)
     f.close()
 
-    print('最大列幅', max_row_length)
-    print(row_list)
+    head_row = ['URL', 'Title', 'Body']
+    with open('./url_title_body_data.csv', 'w', encoding='utf_8_sig') as f:
+        writer = csv.writer(f)
+        writer.writerow(head_row)
+        writer.writerows(url_title_body_list)

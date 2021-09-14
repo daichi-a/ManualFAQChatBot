@@ -12,6 +12,12 @@ from transformers import BertJapaneseTokenizer, BertModel
 import numpy as np
 import pandas as pd
 
+# TF-IDF用
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from janome.tokenizer import Tokenizer
+
 # 必要なライブラリ
 # pipの場合（pipだと色々地獄を見そう）
 #!apt install aptitude swig
@@ -34,7 +40,8 @@ import pandas as pd
 # conda install -c huggingface transformers
 # conda install tornado
 # conda install pandas
-# pip install fugashi ipadic
+# conda install scikit-learn
+# pip install fugashi ipadic janome
 
 # numpyがダメになることがあるので、一度
 # conda uninstall numpyしておいて、
@@ -52,8 +59,14 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         print('received:', message)
 
         self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p><p><strong>検索中です……</strong></p>')
-
+        # BERTの検索を行う
         result_text = self.search_items_by_bert_embedding(message)
+
+        # TF-DFの検索を行う      
+
+        # 両方の検索のかぶっている所を持ってくる。
+        # かぶっている所がなければ、TF-IDFの方を優先
+
 
         self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p>' + result_text)
 
@@ -71,7 +84,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         return True
 
     def search_items_by_bert_embedding(self, text):
-        global df_embedding, df_csv
+        global df_embedding, df_paragraph
         print('seraching items... ')
 
         # 既存のタイトルと一番近い距離のタイトルを検索
@@ -88,24 +101,59 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         distances = np.array(embedding_dist_list)
         #print(distances)
 
+        # これで計算したのは単純なユークリッド距離なので、0に近いほど近い
+        # なので昇順
         min_dist_indexes = np.argsort(distances)
-        min_6_indexes = min_dist_indexes[0:6]
+        min_n_indexes = min_dist_indexes[:10]
         #print(min_6_indexes)
         
-        title_list = df_csv.loc[:, 'Title']
-        title_min_6_list = []
-        url_list = df_csv.loc[:, 'URL']
-        url_min_6_list = []
-        key_sentence_list = df_csv.loc[:, 'Data']
-        key_sentence_min_6_list = []
+        paragraph_title_list = df_paragraph.loc[:, 'Title']
+        paragraph_title_min_n_list = []
+        paragraph_url_list = df_paragraph.loc[:, 'URL']
+        paragraph_url_min_n_list = []
+        paragraph_key_sentence_list = df_paragraph.loc[:, 'Paragraph']
+        paragraph_key_sentence_min_n_list = []
 
-        result_text = ""
-        for i, index in enumerate(min_6_indexes):
-            title_min_6_list.append(title_list[index])
-            url_min_6_list.append(url_list[index])
-            key_sentence_min_6_list.append(key_sentence_list[index])
+        result_text = "<h2>BERTの結果</h2>"
+        for i, index in enumerate(min_n_indexes):
+            paragraph_title_min_n_list.append(paragraph_title_list[index])
+            paragraph_url_min_n_list.append(paragraph_url_list[index])
+            paragraph_key_sentence_min_n_list.append(paragraph_key_sentence_list[index])
 
-            current_result = '<p>候補' + str(i) + '</p><p>' + title_list[index] + '</p><p>マッチした文:' + key_sentence_list[index] + '</p><p><a target="_blank" href="' + url_list[index] + '">' + url_list[index] + '</a></p>'
+            current_result = '<p>候補' + str(i) + '</p><p>' + paragraph_title_list[index] + '</p><p>マッチした文:' + paragraph_key_sentence_list[index] + '</p><p><a target="_blank" href="' + paragraph_url_list[index] + '">' + paragraph_url_list[index] + '</a></p>'
+            # print(current_result)
+
+            result_text = result_text + current_result
+
+        return result_text
+
+    def search_items_by_tfidf(text):
+        global t, tfidf, df_body
+
+        
+        # 1文だけ入れる時は分かち書きしたものをリストに入れて渡す
+        text_tf = vectorizer.transform(wakachi_list(t, text))
+        text_tfidf = transformer.transform(text_tf)
+        # コサイン類似度の計算。IF-IDFは登場頻度と非登場頻度なので、コサイン類似度との相性が良いらしい。
+        similarity = cosine_similarity(text_tfidf, tfidf)[0]
+
+        # TOP10を持ってくる。コサイン類似度は1に近いほど類似しているので、降順になる。
+        top_n_indexes = np.argsort(similarity)[::-1][:10]
+
+        body_title_list = df_body.loc[:, 'Title']
+        body_title_top_n_list = []
+        body_url_list = df_body.loc[:, 'URL']
+        body_url_top_n_list = []
+        body_key_sentence_list = df_body.loc[:, 'Paragraph']
+        body_key_sentence_top_n_list = []
+
+        result_text = "<h2>IFIDFの結果</h2>"
+        for i, index in enumerate(top_n_indexes):
+            paragraph_title_top_n_list.append(body_title_list[index])
+            paragraph_url_top_n_list.append(body_url_list[index])
+            paragraph_key_sentence_top_n_list.append(body_key_sentence_list[index])
+
+            current_result = '<p>候補' + str(i) + '</p><p>' + body_title_list[index] + '</p><p>マッチした文:' + body_key_sentence_list[index] + '</p><p><a target="_blank" href="' + body_url_list[index] + '">' + body_url_list[index] + '</a></p>'
             # print(current_result)
 
             result_text = result_text + current_result
@@ -114,8 +162,10 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
 
 
+topn_indexes = np.argsort(similarity)[::-1][:10]
+
 def calc_embedding_last_layer(text):
-    global bert_tokenizer, model_bert, df_embedding, df_csv
+    global bert_tokenizer, model_bert, df_embedding, df_paragraph
     # 特徴量抽出の関数の定義
     # やってることは最終層の出力を見るだけ
     # 最終層のレイヤーの出力。これをそのまま使うのは良くないと公式ドキュメントにあるそうな
@@ -130,7 +180,7 @@ def calc_embedding_last_layer(text):
 
 
 def initialize_bert_pre_traind_model():
-    global bert_tokenizer, model_bert, df_embedding, df_csv
+    global bert_tokenizer, model_bert, df_embedding, df_paragraph
     # 東北大の。Tokenizerの形態素解析にMeCabを使用（MeCabを経由しているだけだが）
     bert_tokenizer = BertJapaneseTokenizer.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
     model_bert = BertModel.from_pretrained('cl-tohoku/bert-base-japanese-whole-word-masking')
@@ -142,38 +192,86 @@ def initialize_bert_pre_traind_model():
     model_bert.eval()
 
     # CSVの読み込み
-    df_csv = pd.read_csv('url_data.csv')
+    df_paragraph = pd.read_csv('./url_title_paragraph_data.csv')
 
-    # 'Data'列だけを抽出
-    df_title_seq = df_csv.loc[:, 'Data']
+    # 'Paragraph'列だけを抽出
+    df_paragraph_seq = df_paragraph.loc[:, 'Paragraph']
 
     # 特徴量を格納するarrayを作り
-    embedding_array = np.zeros((len(df_title_seq.values), 768), dtype=float)
+    embedding_array = np.zeros((len(df_paragraph_seq.values), 768), dtype=float)
 
-    print('Calc Embedding')
+    print('BERT Calc Embedding')
     # 特徴量の抽出
-    for index, data in np.ndenumerate(df_title_seq.values):
+    for index, data in np.ndenumerate(df_paragraph_seq.values):
         embedding_array[index] = calc_embedding_last_layer(data)
 
-    print('Finish Calc Embedding')
+    print('BERT Finish Calc Embedding')
     df_embedding = pd.DataFrame(embedding_array)
 
 
     return bert_tokenizer, model_bert, df_embedding
 
 
+#わかち書き関数
+def wakachi_list(t, text):
+    global t
+    tokens = t.tokenize(text)
+    docs=[]
+    for token in tokens:
+        docs.append(token.surface)
+    return docs
+
+def wakachi_str(t, text):
+    global t
+    tokens = t.tokenize(text, wakati=True)
+    docs=[]
+    for token in tokens:
+        docs.append(token)
+    return ' '.join(docs)
+
+def initialize_tfidf():
+    global t, tfidf, df_body
+
+    df_body = pd.read_csv('./url_title_body_data.csv')
+
+    t = Tokenizer()
+    corpus0 = df_body.loc[:, 'Body'].values
+    corpus_list = [wakachi_list(t, sentence) for sentence in corpus0]
+    corpus_str = list(wakachi_str(t, sentence) for sentence in corpus0)
+
+    vectorizer = CountVectorizer(token_pattern=u'(?u)\\b\\w+\\b')
+    vectorizer.fit(corpus_str) # 複数を一気に入れる時は半角スペース区切りを取る
+    tf = vectorizer.transform(corpus_str) 
+    transformer = TfidfTransformer()
+    tfidf = transformer.fit_transform(tf)
+
+    #cs_array = cosine_similarity(tfidf, tfidf)
+
+    return t, tfidf
+
+
 if __name__ == '__main__':
     # 複数のWebSocketサーバのインスタンスから見るためにグローバル変数にしておく
     # 読み込みと計算は起動じの1回でよいので
-    global bert_tokenizer, model_bert, df_embedding
+    global bert_tokenizer, model_bert, df_embedding, df_paragraph, t, tfidf, df_body
 
+    print('Start Initializing BERT')
     # ここで、CSVのマニュアルとFAQのデータを読み見込んで、初期化、各項目のタイトルと本文のBERT特徴量を算出しておく
     bert_tokenizer, model_bert, df_embedding = initialize_bert_pre_traind_model()
 
-    print('Initialize BERT ended. Opening WebSocket.')
+    print('End: Initializing BERT.')
+
+    print('Start: Initialize TF-IDF')
+    t, tfidf = initialize_tfidf
+
+
+    print('End: Initialize TF-IDF')
 
     # 特徴量の算出が終わったら、WebSocket Serverを起動
     # 応答できるようになる
+
+    print('Start WebScoket Server.')
     application = tornado.web.Application([('/kibaco_chat_bot', chat_bot_server)])
     application.listen(30005)
     tornado.ioloop.IOLoop.instance().start()
+    print('kibaco Chat Bot: Boot Process Finished')
