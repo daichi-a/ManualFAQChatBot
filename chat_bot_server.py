@@ -128,9 +128,9 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         return result_text
 
     def search_items_by_tfidf(text):
-        global t, tfidf, df_body
+        global tfidf, df_body
 
-        
+        t = Tokenizer()
         # 1文だけ入れる時は分かち書きしたものをリストに入れて渡す
         text_tf = vectorizer.transform(wakachi_list(t, text))
         text_tfidf = transformer.transform(text_tf)
@@ -214,7 +214,7 @@ def initialize_bert_pre_traind_model():
 
 #わかち書き関数
 def wakachi_list(t, text):
-    global t
+
     tokens = t.tokenize(text)
     docs=[]
     for token in tokens:
@@ -222,7 +222,7 @@ def wakachi_list(t, text):
     return docs
 
 def wakachi_str(t, text):
-    global t
+
     tokens = t.tokenize(text, wakati=True)
     docs=[]
     for token in tokens:
@@ -230,7 +230,7 @@ def wakachi_str(t, text):
     return ' '.join(docs)
 
 def initialize_tfidf():
-    global t, tfidf, df_body
+    global tfidf, df_body
 
     df_body = pd.read_csv('./url_title_body_data.csv')
 
@@ -253,7 +253,7 @@ def initialize_tfidf():
 if __name__ == '__main__':
     # 複数のWebSocketサーバのインスタンスから見るためにグローバル変数にしておく
     # 読み込みと計算は起動じの1回でよいので
-    global bert_tokenizer, model_bert, df_embedding, df_paragraph, t, tfidf, df_body
+    global bert_tokenizer, model_bert, df_embedding, df_paragraph, tfidf, df_body
 
     print('Start Initializing BERT')
     # ここで、CSVのマニュアルとFAQのデータを読み見込んで、初期化、各項目のタイトルと本文のBERT特徴量を算出しておく
