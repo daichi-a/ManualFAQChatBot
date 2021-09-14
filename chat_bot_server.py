@@ -146,14 +146,11 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         body_title_top_n_list = []
         body_url_list = df_body.loc[:, 'URL']
         body_url_top_n_list = []
-        body_key_sentence_list = df_body.loc[:, 'Body']
-        body_key_sentence_top_n_list = []
 
         result_text = "<h2>IFIDFの結果</h2>"
         for i, index in enumerate(top_n_indexes):
-            paragraph_title_top_n_list.append(body_title_list[index])
-            paragraph_url_top_n_list.append(body_url_list[index])
-            paragraph_key_sentence_top_n_list.append(body_key_sentence_list[index])
+            body_title_top_n_list.append(body_title_list[index])
+            body_url_top_n_list.append(body_url_list[index])
 
             current_result = '<p>候補' + str(i) + '</p><p>' + body_title_list[index] + '</p><p><a target="_blank" href="' + body_url_list[index] + '">' + body_url_list[index] + '</a></p>'
             # print(current_result)
