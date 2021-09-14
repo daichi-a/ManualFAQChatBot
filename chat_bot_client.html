@@ -14,9 +14,17 @@
 <body>
     <div>
         <p>
-            <input type="button" value="接続開始" onclick="startConnection()" />
-            <input type="button" value="接続終了" onclick="exitConnection()" />
+            <input type="button" value="開始する" onclick="startConnection()" />
+            <input type="button" value="終了する" onclick="exitConnection()" />
         </p>  
+    </div>
+
+    </div>
+    <div id="controll_field">
+        <form>
+            <input type="text" name="text_field" value="ここに入力して「送信」ボタンを押してください．" />
+            <input type="button" name="send_button" value="送信" onclick="sendMessage(this.form.elements['text_field'].value)" />
+        </form>
     </div>
 
 
@@ -27,13 +35,7 @@
         <p>
             チャットボットが、マニュアルやFAQの検索のお手伝いをします。
         </p>
-    </div>
-    <div id="controll_field">
-        <form>
-            <input type="text" name="text_field" value="ここに入力して「送信」ボタンを押してください．" />
-            <input type="button" name="send_button" value="送信" onclick="sendMessage(this.form.elements['text_field'].value)" />
-        </form>
-    </div>
+
 
 </body>
 </html>

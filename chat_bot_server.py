@@ -147,7 +147,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         body_url_list = df_body.loc[:, 'URL']
         body_url_top_n_list = []
 
-        result_text = "<h2>IFIDFの結果</h2>"
+        result_text = "<h2>TFIDFの結果</h2>"
         for i, index in enumerate(top_n_indexes):
             body_title_top_n_list.append(body_title_list[index])
             body_url_top_n_list.append(body_url_list[index])
