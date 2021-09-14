@@ -162,8 +162,6 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
 
 
-topn_indexes = np.argsort(similarity)[::-1][:10]
-
 def calc_embedding_last_layer(text):
     global bert_tokenizer, model_bert, df_embedding, df_paragraph
     # 特徴量抽出の関数の定義
