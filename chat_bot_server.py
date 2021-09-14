@@ -60,15 +60,16 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
         self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p><p><strong>検索中です……</strong></p>')
         # BERTの検索を行う
-        result_text = self.search_items_by_bert_embedding(message)
+        result_text_bert = self.search_items_by_bert_embedding(message)
 
         # TF-DFの検索を行う      
+        result_text_tfidf = self.search_items_by_tfidf(message)
 
         # 両方の検索のかぶっている所を持ってくる。
         # かぶっている所がなければ、TF-IDFの方を優先
+        # とりあえず両方表示
 
-
-        self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p>' + result_text)
+        self.write_message('<p>ご質問は</p><p><strong>' + message + '</strong></p><p>ですね？</p>' + result_text_bert + result_text_tfidf)
 
 
 
@@ -260,7 +261,7 @@ if __name__ == '__main__':
     print('End: Initializing BERT.')
 
     print('Start: Initialize TF-IDF')
-    t, tfidf = initialize_tfidf
+    t, tfidf = initialize_tfidf()
 
 
     print('End: Initialize TF-IDF')
