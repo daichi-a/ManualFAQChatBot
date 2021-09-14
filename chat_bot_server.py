@@ -129,7 +129,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
 
         return result_text
 
-    def search_items_by_tfidf(text):
+    def search_items_by_tfidf(self, text):
         global tfidf, df_body
 
         t = Tokenizer()
