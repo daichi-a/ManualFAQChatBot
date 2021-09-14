@@ -130,12 +130,12 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         return result_text
 
     def search_items_by_tfidf(self, text):
-        global tfidf, df_body
+        global tfidf, tfidf_vectorizer, tfidf_transformer, df_body
 
         t = Tokenizer()
         # 1文だけ入れる時は分かち書きしたものをリストに入れて渡す
-        text_tf = vectorizer.transform(wakachi_list(t, text))
-        text_tfidf = transformer.transform(text_tf)
+        text_tf = tfidf_vectorizer.transform(wakachi_list(t, text))
+        text_tfidf = tfidf_transformer.transform(text_tf)
         # コサイン類似度の計算。IF-IDFは登場頻度と非登場頻度なので、コサイン類似度との相性が良いらしい。
         similarity = cosine_similarity(text_tfidf, tfidf)[0]
 
@@ -230,7 +230,7 @@ def wakachi_str(t, text):
     return ' '.join(docs)
 
 def initialize_tfidf():
-    global tfidf, df_body
+    global tfidf, tfidf_vectorizer, tfidf_transformer, df_body
 
     df_body = pd.read_csv('./url_title_body_data.csv')
 
@@ -239,21 +239,21 @@ def initialize_tfidf():
     corpus_list = [wakachi_list(t, sentence) for sentence in corpus0]
     corpus_str = list(wakachi_str(t, sentence) for sentence in corpus0)
 
-    vectorizer = CountVectorizer(token_pattern=u'(?u)\\b\\w+\\b')
-    vectorizer.fit(corpus_str) # 複数を一気に入れる時は半角スペース区切りを取る
-    tf = vectorizer.transform(corpus_str) 
-    transformer = TfidfTransformer()
-    tfidf = transformer.fit_transform(tf)
+    tfidf_vectorizer = CountVectorizer(token_pattern=u'(?u)\\b\\w+\\b')
+    tfidf_vectorizer.fit(corpus_str) # 複数を一気に入れる時は半角スペース区切りを取る
+    tf = tfidf_vectorizer.transform(corpus_str) 
+    tfidf_transformer = TfidfTransformer()
+    tfidf = tfidf_transformer.fit_transform(tf)
 
     #cs_array = cosine_similarity(tfidf, tfidf)
 
-    return t, tfidf
+    return t, tfidf_vectorizer, tfidf_transformer, tfidf, 
 
 
 if __name__ == '__main__':
     # 複数のWebSocketサーバのインスタンスから見るためにグローバル変数にしておく
     # 読み込みと計算は起動じの1回でよいので
-    global bert_tokenizer, model_bert, df_embedding, df_paragraph, tfidf, df_body
+    global bert_tokenizer, model_bert, df_embedding, df_paragraph, tfidf_vectorizer, tfidf_transformer, tfidf, df_body
 
     print('Start Initializing BERT')
     # ここで、CSVのマニュアルとFAQのデータを読み見込んで、初期化、各項目のタイトルと本文のBERT特徴量を算出しておく
@@ -262,7 +262,7 @@ if __name__ == '__main__':
     print('End: Initializing BERT.')
 
     print('Start: Initialize TF-IDF')
-    t, tfidf = initialize_tfidf()
+    t, tfidf_vectorizer, tfidf_transformer, tfidf = initialize_tfidf()
 
 
     print('End: Initialize TF-IDF')
