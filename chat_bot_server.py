@@ -133,7 +133,7 @@ class chat_bot_server(tornado.websocket.WebSocketHandler):
         global tfidf, tfidf_vectorizer, tfidf_transformer, df_body
 
         t = Tokenizer()
-        # 1文だけ入れる時は分かち書きしたものをリストに入れて渡す
+        # 1文だけ入れる時は、半角スペースで分かち書きしたものを、1要素のリストに入れて渡す
         text_tf = tfidf_vectorizer.transform([wakachi_str(t, text)])
         text_tfidf = tfidf_transformer.transform(text_tf)
         # コサイン類似度の計算。IF-IDFは登場頻度と非登場頻度なので、コサイン類似度との相性が良いらしい。
