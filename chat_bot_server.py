@@ -32,6 +32,7 @@ from janome.tokenizer import Tokenizer
 # condaの場合は、以下
 # Ubuntu18.04LTSのconda環境は3.6で作る必要がある
 # 3.7だとglibcのバージョンで2.29を要求される。Ubuntu 18.04LTSは標準が2.27
+# 20.04LTSなら，glibcが2.29なので3.7でよい
 
 # conda create -n 環境名 python=3.6
 # conda activate 環境名
