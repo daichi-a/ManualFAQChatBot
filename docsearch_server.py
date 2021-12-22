@@ -34,16 +34,22 @@ from janome.tokenizer import Tokenizer
 # 3.7だとglibcのバージョンで2.29を要求される。Ubuntu 18.04LTSは標準が2.27
 # 20.04LTSなら，glibcが2.29なので3.7でよい
 
-# conda create -n 環境名 python=3.6
+# conda create -n 環境名 python=3.9
+# 18.04LTSなら conda create -n 環境名 python=3.6
 # conda activate 環境名
 # conda install -c conda-forge mecab-python3
+## mecab==0.996, mecab-python3==1.0.3
 # conda install -c conda-forge unidic-lite
+## unidic-lite-1.0.8
 # conda install -c pytorch cpuonly pytorch torchvision
+## pytorch-1.10.1-py3.9_cpu_0, torchvision-0.11.2-py39_cpu
 # conda install -c huggingface transformers
+## huggingface/noarch::transformers-4.11.3-py_0
 # conda install tornado
 # conda install pandas
 # conda install scikit-learn
 # pip install fugashi ipadic janome
+## fugashi-1.1.1 ipadic-1.0.0 janome-0.4.1
 
 # numpyがダメになることがあるので、一度
 # conda uninstall numpyしておいて、
